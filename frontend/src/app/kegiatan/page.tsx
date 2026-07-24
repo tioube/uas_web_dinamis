@@ -73,6 +73,27 @@ export default function KegiatanPage() {
     setShowModal(true);
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        alert('File harus berupa gambar (jpg, png, dsb).');
+        e.target.value = '';
+        setPosterFile(null);
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        alert('Ukuran gambar maksimal adalah 2MB.');
+        e.target.value = '';
+        setPosterFile(null);
+        return;
+      }
+      setPosterFile(file);
+    } else {
+      setPosterFile(null);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -300,7 +321,7 @@ export default function KegiatanPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Upload Poster (Opsional)</label>
-                  <input type="file" accept="image/*" onChange={e => setPosterFile(e.target.files?.[0] || null)} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-slate-900" />
+                  <input type="file" accept="image/*" onChange={handleFileChange} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-slate-900" />
                 </div>
                 <div className="flex justify-end gap-3 mt-8">
                   <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 border border-slate-300 rounded-lg text-slate-700 bg-white hover:bg-slate-50 font-medium transition-colors">Batal</button>

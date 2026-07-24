@@ -9,6 +9,7 @@ const userController = new UserController();
 // Endpoint publik: tidak perlu login
 router.post('/forgot-password', userController.forgotPassword);
 router.post('/apply-reset-password', userController.applyResetPassword);
+router.get('/verify-reset-token/:token', userController.verifyResetToken);
 
 // Semua route di bawah ini memerlukan role admin
 router.use(authenticateJWT, requireRole(['admin']));

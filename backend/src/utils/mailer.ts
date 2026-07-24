@@ -20,11 +20,28 @@ export const sendResetPasswordEmail = async (to: string, token: string) => {
     subject: 'Password Reset',
     text: `Anda (atau Admin) baru saja meminta reset password untuk akun Anda.\nSilakan gunakan link berikut untuk membuat password baru:\nhttp://localhost:3001/reset-password?token=${token}`,
     html: `
-      <h3>Reset Password</h3>
-      <p>Anda (atau Admin) baru saja meminta reset password untuk akun Anda.</p>
-      <p>Silakan klik link di bawah ini untuk membuat password baru:</p>
-      <p><a href="http://localhost:3001/reset-password?token=${token}" style="display:inline-block;padding:10px 20px;background:#4f46e5;color:#fff;text-decoration:none;border-radius:5px;">Atur Ulang Password</a></p>
-      <p>Atau gunakan token ini secara manual: <b>${token}</b></p>
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+      </head>
+      <body style="font-family: Arial, sans-serif; padding: 20px; color: #333; background-color: #f9fafb;">
+        <div style="max-width: 600px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 8px; border: 1px solid #e5e7eb;">
+          <h2 style="color: #111827; margin-top: 0; border-bottom: 1px solid #f3f4f6; padding-bottom: 15px;">Permintaan Reset Password</h2>
+          <p style="color: #4b5563; line-height: 1.6;">Halo,</p>
+          <p style="color: #4b5563; line-height: 1.6;">Anda (atau Admin) baru saja meminta reset password untuk akun Anda pada <strong>${new Date().toLocaleString('id-ID')}</strong>.</p>
+          <p style="color: #4b5563; line-height: 1.6;">Silakan klik tombol di bawah ini untuk mengatur ulang password Anda:</p>
+          <div style="margin: 30px 0; text-align: center;">
+            <a href="http://localhost:3001/reset-password?token=${token}" style="display:inline-block;padding:12px 24px;background-color:#4f46e5;color:#ffffff;text-decoration:none;border-radius:6px;font-weight:600;font-size:16px;">Atur Ulang Password</a>
+          </div>
+          <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 30px 0;" />
+          <p style="color: #9ca3af; font-size: 13px; line-height: 1.5; margin-bottom: 0;">
+            Tautan reset password ini hanya berlaku selama 1 jam.<br>
+            Jika Anda tidak merasa meminta reset password, Anda dapat mengabaikan email ini dengan aman.
+          </p>
+        </div>
+      </body>
+      </html>
     `
   };
 

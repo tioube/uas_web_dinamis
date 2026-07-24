@@ -143,6 +143,33 @@ export class UserController {
   };
 
   /**
+   * Verifikasi apakah token masih valid (belum expired) sebelum form ditampilkan
+   */
+  verifyResetToken = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { token } = req.params;
+      if (!token) {
+        return res.status(400).json({ status: 'error', message: 'Token tidak diberikan' });
+      }
+
+      const user = await this.userRepository.findByResetToken(token);
+      if (!user) {
+        return res.status(404).json({ status: 'error', message: 'Token tidak valid atau sudah digunakan' });
+      }
+
+      const now = new Date();
+      const tokenExpiry = new Date(user.reset_token_expired_at);
+      if (now > tokenExpiry) {
+        return res.status(400).json({ status: 'error', message: 'Token sudah kadaluarsa. Silakan minta link reset baru.' });
+      }
+
+      res.json({ status: 'success', message: 'Token valid' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
    * Step 2: User menggunakan token untuk menetapkan password baru.
    * Endpoint ini TIDAK memerlukan autentikasi JWT (akses publik).
    * Body: { token: string, new_password: string }
