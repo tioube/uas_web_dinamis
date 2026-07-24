@@ -152,7 +152,7 @@ export class UserController {
         return res.status(400).json({ status: 'error', message: 'Token tidak diberikan' });
       }
 
-      const user = await this.userRepository.findByResetToken(token);
+      const user = await this.userRepository.findByResetToken(token as string);
       if (!user) {
         return res.status(404).json({ status: 'error', message: 'Token tidak valid atau sudah digunakan' });
       }
