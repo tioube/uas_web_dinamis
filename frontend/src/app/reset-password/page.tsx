@@ -1,0 +1,127 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { fetchApi } from '@/lib/api';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+
+export default function ResetPasswordPage() {
+  const [token, setToken] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  
+  // Use React.use() wrapper not needed here if we use useSearchParams
+  // but next/navigation useSearchParams is fine for client components in next 13+
+  // Since this is Next.js app router, we can get token from URL if provided
+  const searchParams = useSearchParams();
+  
+  useEffect(() => {
+    const urlToken = searchParams.get('token');
+    if (urlToken) {
+      setToken(urlToken);
+    }
+  }, [searchParams]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setMessage('');
+    setIsLoading(true);
+
+    try {
+      const res = await fetchApi('/users/apply-reset-password', {
+        method: 'POST',
+        body: JSON.stringify({ token, new_password: newPassword }),
+      });
+
+      if (res.status === 'success') {
+        setMessage('Password berhasil diubah. Silakan login dengan password baru Anda.');
+        setToken('');
+        setNewPassword('');
+        setTimeout(() => {
+          router.push('/login');
+        }, 3000);
+      } else {
+        setError(res.message);
+      }
+    } catch (err: any) {
+      setError(err.message || 'Gagal mengubah password');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-2xl shadow-xl border border-slate-100">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900">
+            Reset Password
+          </h2>
+          <p className="mt-2 text-center text-sm text-slate-500">
+            Masukkan token dari email Anda dan password baru
+          </p>
+        </div>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+              <span className="block sm:inline">{error}</span>
+            </div>
+          )}
+          {message && (
+            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+              <span className="block sm:inline">{message}</span>
+            </div>
+          )}
+          <div className="rounded-md shadow-sm -space-y-px">
+            <div className="mb-4">
+              <label htmlFor="token" className="block text-sm font-medium text-slate-700 mb-1">Token Reset</label>
+              <input
+                id="token"
+                name="token"
+                type="text"
+                required
+                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-slate-300 placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Masukkan token 32 karakter..."
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
+              />
+            </div>
+            <div>
+              <label htmlFor="newPassword" className="block text-sm font-medium text-slate-700 mb-1">Password Baru</label>
+              <input
+                id="newPassword"
+                name="newPassword"
+                type="password"
+                required
+                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-slate-300 placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Minimal 6 karakter"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="group relative w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors shadow-sm"
+            >
+              {isLoading ? 'Menyimpan...' : 'Simpan Password Baru'}
+            </button>
+          </div>
+          
+          <div className="text-center mt-4">
+            <Link href="/login" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+              Kembali ke Login
+            </Link>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
